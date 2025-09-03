@@ -41,7 +41,7 @@ python translate_srt_gemini.py video1.mkv video2.mp4 [options]
 ## Configuration
 
 Key configuration constants in translate_srt_gemini.py:
-- `CHUTES_API_KEY`: API key for Chutes AI service
+- `CHUTES_API_KEY`: API key for Chutes AI service (set via `CHUTES_API_KEY` env var or `chutes_config.json`)
 - `CHUTES_MODEL_ID`: DeepSeek-V3-0324 model
 - `TARGET_LANG`: "es-ES" (Castilian Spanish)
 - `MAX_RPM`: Rate limiting for API calls

@@ -41,13 +41,37 @@ from collections import deque
 import random
 
 import pysrt
-import httpx # For Chutes API
+import httpx  # For Chutes API
 from tqdm.asyncio import tqdm
 
 # ─────────────────────────────────────────────────────────
 #  Chutes AI Configuration
 # ─────────────────────────────────────────────────────────
-CHUTES_API_KEY = "cpk_683e8bbf1e254321af081dd9d091e4f3.1564f603b0c85c6e8e49eb29536d21b7.UbxOYhuRnJZ8DMcEMHlbn4isA8jjqTyh"
+
+def load_chutes_api_key() -> str:
+    """Load the Chutes API key from environment or config file."""
+    key = os.getenv("CHUTES_API_KEY")
+    if key:
+        return key
+
+    config_path = Path(__file__).with_name("chutes_config.json")
+    if config_path.exists():
+        try:
+            with open(config_path) as f:
+                data = json.load(f)
+            key = data.get("CHUTES_API_KEY")
+            if key:
+                return key
+        except json.JSONDecodeError:
+            pass
+
+    raise SystemExit(
+        "ERROR: CHUTES_API_KEY is missing. Set the CHUTES_API_KEY environment variable "
+        "or provide it in chutes_config.json"
+    )
+
+
+CHUTES_API_KEY = load_chutes_api_key()
 CHUTES_API_ENDPOINT = "https://llm.chutes.ai/v1/chat/completions"
 CHUTES_MODEL_ID = "deepseek-ai/DeepSeek-V3-0324"
 
@@ -112,11 +136,6 @@ CHUTES_SINGLE_LINE_SYSTEM_PROMPT = dedent(f"""
     Return ONLY the translated string, without any additional text, JSON formatting, or explanations.
     Preserve HTML-like tags (e.g., <i>) and bracketed text (e.g., [noise]).
 """).strip()
-
-
-if not CHUTES_API_KEY or "YOUR_KEY_HERE" in CHUTES_API_KEY :
-    print("ERROR: CHUTES_API_KEY is not set correctly. Please ensure it's provided.")
-    sys.exit(1)
 
 # ─────────────────────────────────────────────────────────
 #  ffmpeg helpers
